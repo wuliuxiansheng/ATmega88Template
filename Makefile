@@ -21,6 +21,13 @@ CHILDREN   =
 PARENTS    = 
 
 # --------------------------------------------------------
+# if you are using JTAGICE mkII, let PROGRAMMER = jtag2isp;
+# if you are using AVRISP mkII, let PROGRAMMER = avrispmkII.
+# --------------------------------------------------------
+
+PROGRAMMER	= avrispmkII
+
+# --------------------------------------------------------
 # if you want to use one of our pre-compiled libraries,
 # add it to the line below (e.g. "LIBRARIES = libsaast.a")
 # --------------------------------------------------------
@@ -29,8 +36,11 @@ PARENTS    =
 # you shouldn't change anything below here,
 # unless you really know what you're doing
 # --------------------------------------------------------
-DEVICE     = atmega88a
-CLOCK      = 8000000
+DEVICE     	= atmega88a
+CLOCK      	= 8000000
+
+AVRDUDE_TARGET	= m88
+
 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
@@ -47,12 +57,12 @@ all:	main.hex
 	$(COMPILE) -S $< -o $@
 
 fuse: 
-	avrdude -p m88 -c jtag2isp -P usb -U lfuse:w:0xe2:m -U hfuse:w:0xdf:m -B250
+	avrdude -p $(AVRDUDE_TARGET) -c $(PROGRAMMER) -P usb -U lfuse:w:0xe2:m -U hfuse:w:0xdf:m -B10
 
 install: flash 
 
 flash: all
-	avrdude -p m88 -c jtag2isp -P usb -e -U flash:w:main.hex -B250
+	avrdude -p $(AVRDUDE_TARGET) -c $(PROGRAMMER) -P usb -e -U flash:w:main.hex -B9
 
 clean:
 	rm -f main.hex main.elf $(MAIN) $(CHILDREN)
